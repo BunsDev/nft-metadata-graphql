@@ -63,9 +63,7 @@ export const parseTokenURI = async (uri: string) => {
           .get(url, {
             responseType: "arraybuffer",
           })
-          .then((resp) => {
-            return resp.data
-          });
+          .then((resp) => resp.data);
 
           const imageMetadata = await sharp(imageData)
             .metadata();
