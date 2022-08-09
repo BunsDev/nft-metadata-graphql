@@ -1,13 +1,21 @@
 import { gql, UserInputError } from "apollo-server-express";
 import { isAddress } from "ethers/lib/utils";
+import { parseTokenURI } from "./metadata";
 import { getERC721Contract, isERC721Contract } from "./utils";
 
 export const typeDefs = gql`
   type NftMetadata {
     name: String!
     description: String!
-    image: String
+    image: Image
     attributes: [Attribute!]!
+  }
+
+  type Image {
+    format: String!
+    width: Int!
+    height: Int!
+    originalUrl: String!
   }
 
   type Attribute {
@@ -47,7 +55,7 @@ export const resolvers = {
 
       const url = await contract.tokenURI(tokenId);
 
-      console.log('metadata url', url);
+      const metadata = await parseTokenURI(url);
 
       // Parse metadata URL
       // Consider; web URL (https://), IPFS-based URL(ipfs://) etc.
@@ -56,10 +64,9 @@ export const resolvers = {
       // Reference: https://github.com/spectrexyz/use-nft/blob/main/src/utils.tsx
 
       return {
-        name: "Test",
-        description: "Test description",
-        image: "https://example.com/image.png",
-        attributes: []
+        name: `#${tokenId}`,
+        description: '',
+        ...metadata,
       }
     },
   }
